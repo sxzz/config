@@ -26,9 +26,11 @@ alias gpoh="git push -u origin HEAD"
 alias gpmy="git push -u sxzz"
 alias gpf="git push --force"
 alias gpft="git push --follow-tags"
+alias gpdo="git push --delete origin"
 alias gpl="git pull --rebase"
 alias gcl="git clone"
 alias gst="git stash"
+alias gstp="git stash pop"
 alias grm='git rm'
 alias gmv='git mv'
 
@@ -86,6 +88,9 @@ alias lint="nr lint"
 alias lintf="nr lint --fix"
 alias re="nr release"
 alias nio="ni --prefer-offline"
+alias u="nu"
+alias ui="nu -i"
+alias uli="nu --latest -i"
 
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias coder="code -r ."
@@ -96,11 +101,13 @@ function gbp
     echo \n\nDelete branches:
     echo $GONE_BRANCHES
 
-    read -l -P 'Do you want to continue? [y/N] ' confirm
+    read -l -P 'Do you want to continue? [Y/n] ' confirm
     switch $confirm
-        case Y y
-            echo $GONE_BRANCHES | xargs git branch -D
+        case N n
+            echo Aborted
+            return 1
     end
+    echo $GONE_BRANCHES | xargs git branch -D
 end
 
 # proxy
