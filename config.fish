@@ -173,3 +173,7 @@ end
 set -gx PNPM_HOME $HOME/Library/pnpm
 set -gx PATH "$PNPM_HOME" $PATH
 # pnpm end
+
+# Bun
+set -Ux BUN_INSTALL "$HOME/.bun"
+set -px --path PATH "$HOME/.bun/bin"
