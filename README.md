@@ -1,6 +1,7 @@
 # Dotfiles
 
 - [config.fish](./config.fish)
+- [.vimrc](./.vimrc)
 
 ## Check Also
 
