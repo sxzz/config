@@ -1,4 +1,6 @@
-# Dotfiles
+# Config files
+
+The configuration files for [@sxzz](https://github.com/sxzz).
 
 - [config.fish](./config.fish) - Fish shell config.
 - [create.config.ts](./create.config.ts) - [@sxzz/create](https://github.com/sxzz/create) config.
@@ -6,8 +8,8 @@
 
 ## Check Also
 
-- [eslint-config](https://github.com/sxzz/eslint-config) - My ESLint config.
 - [awesome](https://github.com/sxzz/awesome) - Strongly opinionated list of awesome things.
+- [eslint-config](https://github.com/sxzz/eslint-config) - My ESLint config.
 
 ## Reference
 
