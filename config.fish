@@ -72,6 +72,8 @@ alias gsha="git rev-parse HEAD | pbcopy"
 alias gxn='git clean -dn'
 alias gx='git clean -df'
 
+alias gop='git open'
+
 # GitHub Aliases
 alias ghci='gh run list -L 1'
 alias pr="gh pr checkout"
