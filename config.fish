@@ -92,6 +92,9 @@ alias u="nu"
 alias ui="nu -i"
 alias uli="nu --latest -i"
 
+# @sxzz/create
+alias cr='create'
+
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias coder="code -r ."
 
