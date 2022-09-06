@@ -1,7 +1,8 @@
 # Dotfiles
 
-- [config.fish](./config.fish)
-- [.vimrc](./.vimrc)
+- [config.fish](./config.fish) - Fish shell config.
+- [create.config.ts](./create.config.ts) - [@sxzz/create](https://github.com/sxzz/create) config.
+- [.vimrc](./.vimrc) - Vim config.
 
 ## Check Also
 
