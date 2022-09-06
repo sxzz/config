@@ -129,10 +129,6 @@ end
 function ssh_proxy
     ssh -o ProxyCommand="nc -X 5 -x 127.0.0.1:6152 %h %p" $argv
 end
-function proxy_charles
-    set -gx https_proxy http://127.0.0.1:8888
-    set -gx http_proxy http://127.0.0.1:8888
-end
 
 # Environment Variables
 # fish_add_path /usr/local/sbin
