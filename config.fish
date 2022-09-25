@@ -42,6 +42,8 @@ alias gb="git branch"
 alias gbd="git branch -d"
 alias gbD="git branch -D"
 
+alias gfo='git fetch origin'
+
 alias grb="git rebase"
 alias grbom="git rebase origin/main"
 alias grbod="git rebase origin/dev"
@@ -179,3 +181,6 @@ set -gx PATH "$PNPM_HOME" $PATH
 # Bun
 set -Ux BUN_INSTALL "$HOME/.bun"
 set -px --path PATH "$HOME/.bun/bin"
+
+# starship
+starship init fish | source
