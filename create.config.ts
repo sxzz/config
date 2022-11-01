@@ -13,6 +13,8 @@ const config: Config = {
     },
   ],
 
+  commands: ['code .', 'pnpm i'],
+
   templates: [
     {
       name: 'Library',
@@ -20,12 +22,11 @@ const config: Config = {
 
       variables: {
         description: {
-          type: 'input',
+          type: 'text',
           message: 'Package description',
           initial: 'My awesome typescript library',
         },
       },
-      commands: ['code .', 'ni'],
 
       children: [
         {
@@ -47,7 +48,7 @@ const config: Config = {
           url: 'sxzz/unplugin-starter',
           variables: {
             pascalCase: {
-              type: 'input',
+              type: 'text',
               message: 'Pascal case of project name',
               initial: 'UnpluginStarter',
               required: true,
@@ -72,7 +73,7 @@ const config: Config = {
           url: 'sxzz/monorepo-starter',
           variables: {
             scope: {
-              type: 'input',
+              type: 'text',
               message: 'Package scope of the project',
               required: true,
             },
@@ -92,6 +93,21 @@ const config: Config = {
       name: 'Web App',
       color: 'green',
       children: [
+        {
+          name: 'Vue 3',
+          color: '#42b883',
+          url: 'vitejs/vite/packages/create-vite/template-vue-ts',
+          replaces: [
+            {
+              from: 'vite-vue-typescript-starter',
+              to: (o) => o.project.folderName,
+            },
+          ],
+          commands: ({ project }) => [
+            'mv _gitignore .gitignore',
+            `echo '# ${project.folderName}' > README.md`,
+          ],
+        },
         {
           name: 'Element Plus',
           color: '#409eff',
