@@ -159,14 +159,14 @@ function gbp
         return 1
     end
 
-    set DELETE_BRANCHES (echo $GONE_BRANCHES | gum choose --no-limit --selected=(echo $GONE_BRANCHES | sed -e "s/ /,/g"))
+    set DELETE_BRANCHES (echo $GONE_BRANCHES | gum filter --no-limit --selected=(echo $GONE_BRANCHES | sed -e "s/ /,/g"))
     and echo "Delete branches: "
     and console.blue $DELETE_BRANCHES
     and echo $GONE_BRANCHES | xargs git branch -D
 end
 
 function select_branch
-    git branch | sed -e "s/^[* ]*//g" | gum choose $argv
+    git branch | sed -e "s/^[* ]*//g" | gum filter $argv
 end
 
 # Git rebase && push
