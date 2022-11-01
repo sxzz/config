@@ -15,6 +15,8 @@ alias -s bz2='tar -xjvf' >/dev/null
 alias -s jar='java -jar' >/dev/null
 alias -s md='open -a /Applications/Typora.app' >/dev/null
 
+alias os='cd ~/Developer/open-source'
+
 # Git Aliases
 
 # Go to project root
@@ -34,7 +36,6 @@ alias gstp="git stash pop"
 alias grm='git rm'
 alias gmv='git mv'
 
-alias gco="git checkout"
 alias main='git checkout main'
 alias gcd="git checkout dev"
 
@@ -43,6 +44,8 @@ alias gbd="git branch -d"
 alias gbD="git branch -D"
 
 alias gfo='git fetch origin'
+alias gfu='git fetch upstream'
+alias gfa='git fetch --all'
 
 alias grb="git rebase"
 alias grbom="git rebase origin/main"
@@ -84,7 +87,7 @@ alias fork="gh repo fork"
 
 # NPM Aliases
 alias s="nr start"
-alias d="nr --silent dev"
+alias d="nr dev"
 alias b="nr build"
 alias t="nr test"
 alias tu="nr test -u"
@@ -96,6 +99,7 @@ alias nio="ni --prefer-offline"
 alias u="nu"
 alias ui="nu -i"
 alias uli="nu --latest -i"
+alias reni="rm -fr node_modules && ni"
 
 # @sxzz/create
 alias cr='create'
@@ -103,19 +107,122 @@ alias cr='create'
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias coder="code -r ."
 
-function gbp
-    git remote prune origin
-    set GONE_BRANCHES (git branch -v | grep "\[gone\]" | awk '{print $1}')
-    echo \n\nDelete branches:
-    echo $GONE_BRANCHES
+# Colors
+set RED '\e[1;31m'
+set GREEN '\e[1;32m'
+set YELLOW '\e[1;33m'
+set BLUE '\e[1;34m'
+set PINK '\e[1;35m'
+set SKYBLUE '\e[1;96m'
+set RES '\e[0m'
 
-    read -l -P 'Do you want to continue? [Y/n] ' confirm
-    switch $confirm
-        case N n
-            echo Aborted
-            return 1
+function console.red
+    echo -en "$RED$argv$RES"
+end
+
+function console.green
+    echo -en "$GREEN$argv$RES"
+end
+
+function console.yellow
+    echo -en "$YELLOW$argv$RES"
+end
+
+function console.blue
+    echo -en "$BLUE$argv$RES"
+end
+
+function console.skyblue
+    echo -en "$SKYBLUE$argv$RES"
+end
+function console.pink
+    echo -en "$PINK$argv$RES"
+end
+
+# Switch node version (fnm)
+function sn
+    set versions (fnm ls | awk '{print $2}')
+    and set selected (fnm ls | awk '{print $2}' | tail -r | gum filter)
+    and fnm use $selected
+end
+
+# git branch prune
+function gbp
+    gum spin --spinner globe --title "Fetching..." -- git remote prune origin
+    if not test $status -eq 0
+        return 1
     end
-    echo $GONE_BRANCHES | xargs git branch -D
+
+    set GONE_BRANCHES (git branch -v | grep -v "^*" | grep "\[gone\]" | awk '{print $1}')
+    if not test "$GONE_BRANCHES"
+        console.yellow "No gone branches\n"
+        return 1
+    end
+
+    set DELETE_BRANCHES (echo $GONE_BRANCHES | gum choose --no-limit --selected=(echo $GONE_BRANCHES | sed -e "s/ /,/g"))
+    and echo "Delete branches: "
+    and console.blue $DELETE_BRANCHES
+    and echo $GONE_BRANCHES | xargs git branch -D
+end
+
+function select_branch
+    git branch | sed -e "s/^[* ]*//g" | gum choose $argv
+end
+
+# Git rebase && push
+function grbp
+    gum spin --spinner globe --title "Fetching..." -- git fetch --all
+    and set SELECTED_BRANCH (select_branch --no-limit)
+    for name in $SELECTED_BRANCH
+        echo -en "\nProcessing '"
+        and console.blue $name
+        and echo -e "'"
+        and git checkout $name
+        and grbum
+        and gpf
+    end
+end
+
+function select_commit
+    set LOG (git log --oneline)
+    and printf "%s\n" $LOG | sed -e "s/^ //g" | gum filter | awk '{print $1}'
+end
+
+function grst
+    set COMMIT_ID (select_commit)
+    if not test $COMMIT_ID
+        return 1
+    end
+    set COMMAND "git reset $argv $COMMIT_ID"
+
+    and echo -n "Execute: "
+    and console.green "$COMMAND\n"
+    and eval $COMMAND
+end
+
+function grvt
+    set COMMIT_ID (select_commit)
+    if not test $COMMIT_ID
+        return 1
+    end
+    set COMMAND "git revert $argv $COMMIT_ID"
+
+    and echo -n "Execute: "
+    and console.green "$COMMAND\n"
+    and eval $COMMAND
+end
+
+function gco
+    if test $argv
+        git checkout $argv
+    else
+        set SELECTED_BRANCH (select_branch)
+        if not test $SELECTED_BRANCH
+            return 1
+        end
+        git checkout $SELECTED_BRANCH
+    end
+    return $status
 end
 
 # proxy
