@@ -25,7 +25,6 @@ alias grt='cd "$(git rev-parse --show-toplevel)"'
 alias gs="git status"
 alias gp="git push"
 alias gpoh="git push -u origin HEAD"
-alias gpmy="git push -u sxzz"
 alias gpf="git push --force"
 alias gpft="git push --follow-tags"
 alias gpdo="git push --delete origin"
@@ -36,7 +35,7 @@ alias gstp="git stash pop"
 alias grm='git rm'
 alias gmv='git mv'
 
-alias main='git checkout main'
+alias main='git checkout (get_main_branch)'
 alias gcd="git checkout dev"
 
 alias gb="git branch"
@@ -44,13 +43,13 @@ alias gbd="git branch -d"
 alias gbD="git branch -D"
 
 alias gfo='git fetch origin'
-alias gfu='git fetch upstream'
+alias gfu='git fetch (get_upstream)'
 alias gfa='git fetch --all'
 
 alias grb="git rebase"
-alias grbom="git rebase origin/main"
+alias grbom="git rebase origin/(get_main_branch)"
 alias grbod="git rebase origin/dev"
-alias grbum="git rebase upstream/main"
+alias grbum="git rebase (get_upstream)/(get_main_branch)"
 alias grbc="git rebase --continue"
 alias grba="git rebase --abort"
 
@@ -60,8 +59,8 @@ alias glo="git log --oneline --graph"
 alias grsH="git reset HEAD"
 alias grsH1="git reset HEAD~1"
 alias grsh="git reset --hard"
-alias grshod="git reset --hard origin/dev"
-alias grshom="git reset --hard origin/main"
+alias grsod="git reset --hard origin/dev"
+alias grsum="git reset --hard (get_upstream)/(get_main_branch)"
 
 alias ga="git add"
 alias gA="git add -A"
@@ -70,10 +69,11 @@ alias gc="git commit"
 alias gcm="git commit -m"
 alias gca="git commit -a"
 alias gcae="git commit --amend"
-alias gcaen="git commit --amend -n"
+alias gcaen="git commit --amend --no-edit -n"
+alias regcp="gcaen -a && gpf"
 alias gcam="git add -A && git commit -m"
-alias gfrb="git fetch origin && git rebase origin/main"
-alias gsha="git rev-parse HEAD | pbcopy"
+alias gfrb="git fetch (get_upstream) && grbom"
+alias gsha="git rev-parse HEAD | tr -d \n | pbcopy"
 
 alias gxn='git clean -dn'
 alias gx='git clean -df'
@@ -139,6 +139,29 @@ function console.pink
     echo -en "$PINK$argv$RES"
 end
 
+function get_main_branch
+    if test -f .git/refs/heads/main
+        echo main
+    else if test -f .git/refs/heads/dev
+        echo dev
+    else if test -f .git/refs/heads/master
+        echo master
+    else
+        console.red "No main or master branch found\n"
+        return 1
+    end
+end
+
+function get_upstream
+    if test -d .git/refs/remotes/upstream
+        echo upstream
+    else if test -d .git/refs/remotes/origin
+        echo origin
+    else
+        console.red "No main or master branch found\n"
+    end
+end
+
 # Switch node version (fnm)
 function sn
     set versions (fnm ls | awk '{print $2}')
@@ -148,7 +171,9 @@ end
 
 # git branch prune
 function gbp
-    gum spin --spinner globe --title "Fetching..." -- git remote prune origin
+    main
+
+    gum spin --spinner globe --title "Fetching..." -- git remote prune (get_upstream)
     if not test $status -eq 0
         return 1
     end
@@ -174,9 +199,7 @@ function grbp
     gum spin --spinner globe --title "Fetching..." -- git fetch --all
     and set SELECTED_BRANCH (select_branch --no-limit)
     for name in $SELECTED_BRANCH
-        echo -en "\nProcessing '"
-        and console.blue $name
-        and echo -e "'"
+        echo -e "\nProcessing '$BLUE$name$RES' branch..."
         and git checkout $name
         and grbum
         and gpf
@@ -185,7 +208,7 @@ end
 
 function select_commit
     set LOG (git log --oneline)
-    and printf "%s\n" $LOG | sed -e "s/^ //g" | gum filter | awk '{print $1}'
+    and printf "%s\n" $LOG | sed -e "s/^ //g" | gum filter $argv | awk '{print $1}'
 end
 
 function grst
