@@ -173,9 +173,10 @@ end
 function gbp
     main
 
-    gum spin --spinner globe --title "Fetching..." -- git remote prune (get_upstream)
-    if not test $status -eq 0
-        return 1
+    gum spin --spinner globe --title "Fetching..." -- git remote prune origin
+    set _status $status
+    if not test $_status -eq 0
+        return $_status
     end
 
     set GONE_BRANCHES (git branch -v | grep -v "^*" | grep "\[gone\]" | awk '{print $1}')
@@ -184,9 +185,9 @@ function gbp
         return 1
     end
 
-    set DELETE_BRANCHES (echo $GONE_BRANCHES | gum filter --no-limit --selected=(echo $GONE_BRANCHES | sed -e "s/ /,/g"))
+    set DELETE_BRANCHES (gum choose --no-limit --selected=(echo $GONE_BRANCHES | sed -e "s/ /,/g") $GONE_BRANCHES)
     and echo "Delete branches: "
-    and console.blue $DELETE_BRANCHES
+    and console.blue "$DELETE_BRANCHES\n"
     and echo $GONE_BRANCHES | xargs git branch -D
 end
 
@@ -203,6 +204,10 @@ function grbp
         and git checkout $name
         and grbum
         and gpf
+        set _status $status
+        if not test $_status -eq 0
+            return $_status
+        end
     end
 end
 
@@ -294,7 +299,7 @@ set PATH $HOME/.jenv/bin $PATH
 status --is-interactive; and source (jenv init -|psub)
 
 # iTerm2
-test -e {$HOME}/.iterm2_shell_integration.fish; and source {$HOME}/.iterm2_shell_integration.fish
+source $HOME/.iterm2_shell_integration.fish
 
 # Python pdm
 if test -n "$PYTHONPATH"
