@@ -153,6 +153,10 @@ function get_main_branch
     end
 end
 
+function get_current_branch
+    git rev-parse --abbrev-ref HEAD
+end
+
 function get_upstream
     if test -d .git/refs/remotes/upstream
         echo upstream
@@ -168,6 +172,13 @@ function sn
     set versions (fnm ls | awk '{print $2}')
     and set selected (fnm ls | awk '{print $2}' | tail -r | gum filter)
     and fnm use $selected
+end
+
+# git new branch & git reset
+function gbc
+    git branch $argv
+    and git reset --hard (get_upstream)/(get_current_branch)
+    and git checkout $argv
 end
 
 # git branch prune
@@ -288,6 +299,10 @@ fish_add_path $GOPATH/bin
 fish_add_path $HOME/Developer/flutter/bin
 set -gx FLUTTER_STORAGE_BASE_URL https://mirrors.tuna.tsinghua.edu.cn/flutter
 set -gx PUB_HOSTED_URL https://mirrors.tuna.tsinghua.edu.cn/dart-pub
+
+# Android
+set -gx ANDROID_HOME $HOME/Android
+set -gx NDK_HOME ~/Android/ndk/25.1.8937393
 
 # Composer
 fish_add_path $HOME/.composer/vendor/bin
