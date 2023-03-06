@@ -1,5 +1,5 @@
 [user]
-	name = 三咲智子
+	name = 三咲智子 Kevin Deng
 	email = sxzz@sxzz.moe
 	signingKey = 875207EAE15488CF94C3241169992F2250DFD93E
 [commit]
@@ -9,7 +9,6 @@
 [receive]
 	denyCurrentBranch = warn
 [push]
-	followTags = true
 	default = current
 	autoSetupRemote = true
 [core]
