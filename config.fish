@@ -83,7 +83,6 @@ alias gop='git open'
 
 # GitHub Aliases
 alias ghci='gh run list -L 1'
-alias pr="gh pr checkout"
 alias fork="gh repo fork"
 
 # NPM Aliases
@@ -101,6 +100,7 @@ alias u="nu"
 alias ui="nu -i"
 alias uli="nu --latest -i"
 alias reni="rm -fr node_modules && ni"
+alias nif="ni -f"
 
 # @sxzz/create
 alias cr='create'
@@ -141,11 +141,12 @@ function console.pink
 end
 
 function get_main_branch
-    if test -f .git/refs/heads/main
+    set BRANCHES (git branch | sed -e "s/^[* ]*//g")
+    if contains main $BRANCHES
         echo main
-    else if test -f .git/refs/heads/dev
+    else if contains dev $BRANCHES
         echo dev
-    else if test -f .git/refs/heads/master
+    else if contains master $BRANCHES
         echo master
     else
         console.red "No main or master branch found\n"
@@ -254,7 +255,7 @@ end
 
 function gco
     if test $argv
-        git checkout $argv
+        git checkout (string split : -m1 $argv)[-1]
     else
         set SELECTED_BRANCH (select_branch)
         if not test $SELECTED_BRANCH
@@ -263,6 +264,15 @@ function gco
         git checkout $SELECTED_BRANCH
     end
     return $status
+end
+
+
+function pr
+    gh pr checkout -b "pr/$argv" $argv
+    and set PR_DATA (gh api /repos/{owner}/{repo}/pulls/$argv)
+    and set PR_URL (echo $PR_DATA | jq -r ".head.repo.clone_url")
+    and set PR_BRANCH (echo $PR_DATA | jq -r ".head.ref")
+    and git push -u (gh api /repos/{owner}/{repo}/pulls/$argv --jq ".head.repo.clone_url") "pr/$argv:$PR_BRANCH"
 end
 
 # proxy
@@ -327,7 +337,6 @@ end
 # pnpm
 set -gx PNPM_HOME $HOME/Library/pnpm
 set -gx PATH "$PNPM_HOME" $PATH
-# pnpm end
 
 # Bun
 set -Ux BUN_INSTALL "$HOME/.bun"
@@ -335,3 +344,12 @@ set -px --path PATH "$HOME/.bun/bin"
 
 # starship
 starship init fish | source
+
+# fnm
+fnm env --use-on-cd | source
+
+# pnpm
+set -gx PNPM_HOME /Users/kevin/Library/pnpm
+set -gx PATH "$PNPM_HOME" $PATH
+# pnpm end
+set -a fish_user_paths ./node_modules/.bin
