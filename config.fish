@@ -33,8 +33,6 @@ alias gpl="git pull --rebase"
 alias gcl="git clone"
 alias gst="git stash"
 alias gstp="git stash pop"
-alias grm='git rm'
-alias gmv='git mv'
 
 alias main='git checkout (get_main_branch)'
 alias gcd="git checkout dev"
@@ -53,6 +51,9 @@ alias grbod="git rebase origin/dev"
 alias grbum="git rebase (get_upstream)/(get_main_branch)"
 alias grbc="git rebase --continue"
 alias grba="git rebase --abort"
+
+alias gm="git merge"
+alias gmm="git merge (get_upstream)/(get_main_branch)"
 
 alias gl="git log"
 alias glo="git log --oneline --graph"
@@ -83,7 +84,11 @@ alias gop='git open'
 
 # GitHub Aliases
 alias ghci='gh run list -L 1'
-alias fork="gh repo fork"
+alias fork="gh repo fork --default-branch-only"
+
+function ghfl
+    gh api /user --jq '"🎉 @" + .login + " has " + (.followers|tostring) + " followers!"'
+end
 
 # NPM Aliases
 alias s="nr start"
@@ -101,9 +106,6 @@ alias ui="nu -i"
 alias uli="nu --latest -i"
 alias reni="rm -fr node_modules && ni"
 alias nif="ni -f"
-
-# @sxzz/create
-alias cr='create'
 
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias coder="code -r ."
@@ -269,10 +271,19 @@ end
 
 function pr
     gh pr checkout -b "pr/$argv" $argv
-    and set PR_DATA (gh api /repos/{owner}/{repo}/pulls/$argv)
-    and set PR_URL (echo $PR_DATA | jq -r ".head.repo.clone_url")
-    and set PR_BRANCH (echo $PR_DATA | jq -r ".head.ref")
-    and git push -u (gh api /repos/{owner}/{repo}/pulls/$argv --jq ".head.repo.clone_url") "pr/$argv:$PR_BRANCH"
+    # and set PR_DATA (gh api /repos/{owner}/{repo}/pulls/$argv)
+    # and set PR_URL (echo $PR_DATA | jq -r ".head.repo.clone_url")
+    # and set PR_BRANCH (echo $PR_DATA | jq -r ".head.ref")
+    # and git config "branch.$BRANCH.merge" "refs/heads/$PR_BRANCH"
+    # and git config "branch.$BRANCH.remote" $PR_URL
+    # and git push -u (gh api /repos/{owner}/{repo}/pulls/$argv --jq ".head.repo.clone_url") "pr/$argv:$PR_BRANCH"
+end
+
+function prp
+    set BRANCH (get_current_branch)
+    and set REMOTE (git config --get "branch.$BRANCH.remote")
+    and set REMOTE_BRANCH (git config --get "branch.$BRANCH.merge" | string replace refs/heads/ "")
+    and git push -u $REMOTE "$BRANCH:$REMOTE_BRANCH" $argv
 end
 
 # proxy
