@@ -1,3 +1,12 @@
+# Fisher plugins:
+# jorgebucaran/fisher
+# franciscolourenco/done
+# jethrokuan/z
+# jorgebucaran/replay.fish
+# edc/bass
+# nickeb96/puffer-fish
+# gazorby/fish-abbreviation-tips
+
 if status is-interactive
     # Commands to run in interactive sessions can go here
 end
@@ -85,6 +94,10 @@ alias gop='git open'
 # GitHub Aliases
 alias ghci='gh run list -L 1'
 alias fork="gh repo fork --default-branch-only"
+
+function ghdep
+    gh search prs --owner sxzz is:open author:app/renovate archived:false --json url --jq ".[].url" | gxargs -I URL bash -c 'echo "Approving & merging: URL" && gh pr review --approve URL && gh pr merge --squash --auto URL'
+end
 
 function ghfl
     gh api /user --jq '"🎉 @" + .login + " has " + (.followers|tostring) + " followers!"'
@@ -208,22 +221,6 @@ end
 
 function select_branch
     git branch | sed -e "s/^[* ]*//g" | gum filter $argv
-end
-
-# Git rebase && push
-function grbp
-    gum spin --spinner globe --title "Fetching..." -- git fetch --all
-    and set SELECTED_BRANCH (select_branch --no-limit)
-    for name in $SELECTED_BRANCH
-        echo -e "\nProcessing '$BLUE$name$RES' branch..."
-        and git checkout $name
-        and grbum
-        and gpf
-        set _status $status
-        if not test $_status -eq 0
-            return $_status
-        end
-    end
 end
 
 function select_commit
@@ -364,3 +361,9 @@ set -gx PNPM_HOME /Users/kevin/Library/pnpm
 set -gx PATH "$PNPM_HOME" $PATH
 # pnpm end
 set -a fish_user_paths ./node_modules/.bin
+
+# tabtab source for packages
+# uninstall by removing these lines
+[ -f ~/.config/tabtab/fish/__tabtab.fish ]; and . ~/.config/tabtab/fish/__tabtab.fish; or true
+
+export PATH="$PATH:/Users/kevin/.foundry/bin"
