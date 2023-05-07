@@ -95,8 +95,9 @@ alias gop='git open'
 alias ghci='gh run list -L 1'
 alias fork="gh repo fork --default-branch-only"
 
-function ghdep
-    gh search prs --owner sxzz is:open author:app/renovate archived:false --json url --jq ".[].url" | gxargs -I URL bash -c 'echo "Approving & merging: URL" && gh pr review --approve URL && gh pr merge --squash --auto URL'
+function ghdep --argument owner
+    test -n "$owner"; or set owner sxzz
+    gh search prs --owner $owner is:open author:app/renovate archived:false --json url --jq ".[].url" | gxargs -I URL bash -c 'echo "Approving & merging: URL" && gh pr review --approve URL && gh pr merge --squash --auto URL'
 end
 
 function ghfl
