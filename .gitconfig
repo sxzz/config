@@ -1,9 +1,10 @@
 [user]
 	name = 三咲智子 Kevin Deng
 	email = sxzz@sxzz.moe
-	signingKey = 875207EAE15488CF94C3241169992F2250DFD93E
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIBiM3iciB9JcRtEtmXoCGV1UpQ65WcVOLv71e/v/mM0
 [commit]
 	gpgSign = true
+	verbose = true
 [init]
 	defaultBranch = main
 [receive]
@@ -13,5 +14,26 @@
 	autoSetupRemote = true
 [core]
 	autocrlf = input
+	pager = delta
 [tag]
 	gpgSign = true
+[pull]
+	rebase = true
+[help]
+	autocorrect = prompt
+
+[interactive]
+	diffFilter = delta --color-only
+[merge]
+	conflictstyle = zdiff3
+[diff]
+	colorMoved = default
+	algorithm = histogram
+
+[delta]
+	navigate = true
+	light = false
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
