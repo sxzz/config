@@ -15,7 +15,7 @@ end
 alias l='ls -lah'
 alias ll='ls -l'
 alias la='ls -a'
-alias cat="ccat"
+alias cat='bat -p --paging=never'
 
 alias -s gz='tar -xzvf' >/dev/null
 alias -s tgz='tar -xzvf' >/dev/null
@@ -25,6 +25,7 @@ alias -s jar='java -jar' >/dev/null
 alias -s md='open -a /Applications/Typora.app' >/dev/null
 
 alias os='cd ~/Developer/open-source'
+alias cppwd='pwd | tr -d \n | pbcopy'
 
 # Git Aliases
 
@@ -34,7 +35,7 @@ alias grt='cd "$(git rev-parse --show-toplevel)"'
 alias gs="git status"
 alias gp="git push"
 alias gpoh="git push -u origin HEAD"
-alias gpf="git push --force"
+alias gpf="git push --force-with-lease"
 alias gpft="git push --follow-tags"
 alias gpdo="git push --delete origin"
 alias gpsync="gco (get_main_branch) && gpl && git push origin (get_main_branch)"
@@ -57,7 +58,7 @@ alias gfa='git fetch --all'
 alias grb="git rebase"
 alias grbom="git rebase origin/(get_main_branch)"
 alias grbod="git rebase origin/dev"
-alias grbum="git rebase (get_upstream)/(get_main_branch)"
+alias grbum="grt && git rebase (get_upstream)/(get_main_branch)"
 alias grbc="git rebase --continue"
 alias grba="git rebase --abort"
 
@@ -81,6 +82,8 @@ alias gcm="git commit -m"
 alias gca="git commit -a"
 alias gcae="git commit --amend"
 alias gcaen="git commit --amend --no-edit -n"
+alias gcn="git commit -n"
+alias gcnn="git commit --no-edit -n"
 alias regcp="gcaen -a && gpf"
 alias gcam="git add -A && git commit -m"
 alias gfrb="git fetch (get_upstream) && grbom"
@@ -89,11 +92,14 @@ alias gsha="git rev-parse HEAD | tr -d \n | pbcopy"
 alias gxn='git clean -dn'
 alias gx='git clean -df'
 
+alias gcp='git cherry-pick'
+alias ggc='git reflog expire --expire-unreachable=now --all && git gc --prune=now'
+
 alias gop='git open'
 
 # GitHub Aliases
 alias ghci='gh run list -L 1'
-alias fork="gh repo fork --default-branch-only"
+alias fork="gh repo fork --default-branch-only --remote"
 
 function ghdep --argument owner
     test -n "$owner"; or set owner sxzz
@@ -104,9 +110,28 @@ function ghfl
     gh api /user --jq '"🎉 @" + .login + " has " + (.followers|tostring) + " followers!"'
 end
 
+function ipr
+    cd $HOME/Developer/open-source
+    and git clone $argv
+    and set REPO (string split / $argv)
+    and cd (string replace '.git' '' $REPO[-1])
+    and fork
+    and code .
+end
+
+function d
+    set SCRIPTS (npm_scripts)
+    and if contains start $SCRIPTS
+        nr start $argv
+    else if contains serve $SCRIPTS
+        nr serve $argv
+    else
+        nr dev $argv
+    end
+end
+
 # NPM Aliases
 alias s="nr start"
-alias d="nr dev"
 alias b="nr build"
 alias t="nr test"
 alias tu="nr test -u"
@@ -120,6 +145,7 @@ alias ui="nu -i"
 alias uli="nu --latest -i"
 alias reni="rm -fr node_modules && ni"
 alias nif="ni -f"
+alias tc="nr typecheck"
 
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias coder="code -r ."
@@ -158,10 +184,10 @@ end
 
 function get_main_branch
     set BRANCHES (git branch | sed -e "s/^[* ]*//g")
-    if contains main $BRANCHES
-        echo main
-    else if contains dev $BRANCHES
+    if contains dev $BRANCHES
         echo dev
+    else if contains main $BRANCHES
+        echo main
     else if contains master $BRANCHES
         echo master
     else
@@ -284,6 +310,10 @@ function prp
     and git push -u $REMOTE "$BRANCH:$REMOTE_BRANCH" $argv
 end
 
+function npm_scripts
+    jq -r '.scripts | keys[]' <package.json
+end
+
 # proxy
 function proxy
     set -gx https_proxy http://127.0.0.1:6152
@@ -347,6 +377,9 @@ end
 set -gx PNPM_HOME $HOME/Library/pnpm
 set -gx PATH "$PNPM_HOME" $PATH
 
+# Corepack
+set -gx COREPACK_ENABLE_DOWNLOAD_PROMPT 0
+
 # Bun
 set -Ux BUN_INSTALL "$HOME/.bun"
 set -px --path PATH "$HOME/.bun/bin"
@@ -354,17 +387,15 @@ set -px --path PATH "$HOME/.bun/bin"
 # starship
 starship init fish | source
 
-# fnm
-fnm env --use-on-cd | source
-
 # pnpm
 set -gx PNPM_HOME /Users/kevin/Library/pnpm
 set -gx PATH "$PNPM_HOME" $PATH
 # pnpm end
+
 set -a fish_user_paths ./node_modules/.bin
 
-# tabtab source for packages
-# uninstall by removing these lines
-[ -f ~/.config/tabtab/fish/__tabtab.fish ]; and . ~/.config/tabtab/fish/__tabtab.fish; or true
+# Ruby
+fish_add_path /opt/homebrew/opt/ruby/bin
+fish_add_path $HOME/.foundry/bin
 
-export PATH="$PATH:/Users/kevin/.foundry/bin"
+# eval "$(sheldon source)"
