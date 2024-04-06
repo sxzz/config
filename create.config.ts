@@ -32,10 +32,10 @@ const config: Config = {
         {
           name: 'TypeScript',
           color: '#3178c6',
-          url: 'sxzz/node-lib-starter',
+          url: 'sxzz/ts-lib-starter',
 
           replaces: [
-            { from: 'node-lib-starter', to: (o) => o.project.folderName },
+            { from: 'ts-lib-starter', to: (o) => o.project.folderName },
             {
               from: 'My awesome typescript library',
               to: (o) => o.project.variables.description,
@@ -56,6 +56,10 @@ const config: Config = {
           },
 
           replaces: [
+            {
+              from: 'sxzz/unplugin-starter',
+              to: (o) => `unplugin/${o.project.folderName}`,
+            },
             { from: 'unplugin-starter', to: (o) => o.project.folderName },
             {
               from: 'UnpluginStarter',
@@ -63,6 +67,10 @@ const config: Config = {
             },
             {
               from: 'Description.',
+              to: (o) => o.project.variables.description,
+            },
+            {
+              from: 'Starter template for [unplugin](https://github.com/unjs/unplugin).',
               to: (o) => o.project.variables.description,
             },
           ],
