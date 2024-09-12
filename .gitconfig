@@ -12,6 +12,8 @@
 [push]
 	default = current
 	autoSetupRemote = true
+[rebase]
+	autoStash = true
 [core]
 	autocrlf = input
 	pager = delta
@@ -21,15 +23,11 @@
 	rebase = true
 [help]
 	autocorrect = prompt
-
 [interactive]
 	diffFilter = delta --color-only
-[merge]
-	conflictstyle = zdiff3
 [diff]
 	colorMoved = default
 	algorithm = histogram
-
 [delta]
 	navigate = true
 	light = false
@@ -37,3 +35,7 @@
 	format = ssh
 [gpg "ssh"]
 	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+[alias]
+undo = reset --soft HEAD^
+cancel = reset --hard HEAD^
+append = commit -a --amend --no-edit
