@@ -33,9 +33,8 @@ alias cppwd='pwd | tr -d \n | pbcopy'
 alias grt='cd "$(git rev-parse --show-toplevel)"'
 
 alias gs="git status"
-alias gp="git push"
+alias gpf="gp --force-with-lease"
 alias gpoh="git push -u origin HEAD"
-alias gpf="git push --force-with-lease"
 alias gpft="git push --follow-tags"
 alias gpdo="git push --delete origin"
 alias gpsync="gco (get_main_branch) && gpl && git push origin (get_main_branch)"
@@ -101,6 +100,8 @@ alias gop='git open'
 alias ghci='gh run list -L 1'
 alias fork="gh repo fork --default-branch-only --remote"
 
+alias hmm='gh copilot suggest'
+
 function ghdep --argument owner
     test -n "$owner"; or set owner sxzz
     gh search prs --owner $owner is:open author:app/renovate archived:false --json url --jq ".[].url" | gxargs -I URL bash -c 'echo "Approving & merging: URL" && gh pr review --approve URL && gh pr merge --squash --auto URL'
@@ -121,12 +122,23 @@ end
 
 function d
     set SCRIPTS (npm_scripts)
-    and if contains start $SCRIPTS
+    and if contains dev $SCRIPTS
+        nr dev $argv
+    else if contains start $SCRIPTS
         nr start $argv
     else if contains serve $SCRIPTS
         nr serve $argv
     else
-        nr dev $argv
+        echo "No dev or start script found"
+    end
+end
+
+function tc
+    set SCRIPTS (npm_scripts)
+    and if contains check $SCRIPTS
+        nr check $argv
+    else
+        nr typecheck $argv
     end
 end
 
@@ -145,7 +157,8 @@ alias ui="nu -i"
 alias uli="nu --latest -i"
 alias reni="rm -fr node_modules && ni"
 alias nif="ni -f"
-alias tc="nr typecheck"
+
+alias re_source="source ~/.config/fish/config.fish"
 
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 alias coder="code -r ."
@@ -246,6 +259,12 @@ function gbp
     and echo $GONE_BRANCHES | xargs git branch -D
 end
 
+function clean_remote
+    main
+    and git remote | grep -v 'origin\|upstream' | xargs -I REMOTE git remote remove REMOTE
+    git remote -v
+end
+
 function select_branch
     git branch | sed -e "s/^[* ]*//g" | gum filter $argv
 end
@@ -303,6 +322,14 @@ function pr
     # and git push -u (gh api /repos/{owner}/{repo}/pulls/$argv --jq ".head.repo.clone_url") "pr/$argv:$PR_BRANCH"
 end
 
+function gp
+    if string match -r '^pr\/\d+' (get_current_branch) >/dev/null
+        prp $argv
+    else
+        git push $argv
+    end
+end
+
 function prp
     set BRANCH (get_current_branch)
     and set REMOTE (git config --get "branch.$BRANCH.remote")
@@ -333,9 +360,7 @@ end
 # fish_add_path /usr/local/sbin
 
 # Homebrew
-fish_add_path /opt/homebrew/bin
-fish_add_path /opt/homebrew/sbin
-fish_add_path /usr/local/bin
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # 1Passsword SSH
 set -gx SSH_AUTH_SOCK $HOME/.1password/agent.sock
@@ -375,10 +400,13 @@ end
 
 # pnpm
 set -gx PNPM_HOME $HOME/Library/pnpm
-set -gx PATH "$PNPM_HOME" $PATH
+fish_add_path $PNPM_HOME
+# pnpm end
+set -a fish_user_paths ./node_modules/.bin
 
 # Corepack
 set -gx COREPACK_ENABLE_DOWNLOAD_PROMPT 0
+set -gx COREPACK_ENABLE_AUTO_PIN 0
 
 # Bun
 set -Ux BUN_INSTALL "$HOME/.bun"
@@ -387,15 +415,8 @@ set -px --path PATH "$HOME/.bun/bin"
 # starship
 starship init fish | source
 
-# pnpm
-set -gx PNPM_HOME /Users/kevin/Library/pnpm
-set -gx PATH "$PNPM_HOME" $PATH
-# pnpm end
-
-set -a fish_user_paths ./node_modules/.bin
-
 # Ruby
 fish_add_path /opt/homebrew/opt/ruby/bin
 fish_add_path $HOME/.foundry/bin
 
-# eval "$(sheldon source)"
+zoxide init fish | source
