@@ -11,6 +11,10 @@ const config: Config = {
       from: /\n.*Remove belows[\w\W]*Remove aboves.*\n/gi,
       to: '',
     },
+    {
+      from: /^.*Remove Start[\s\S]*Remove End.*$/gm,
+      to: '',
+    },
   ],
 
   commands: ['code .', 'pnpm i'],
@@ -24,7 +28,7 @@ const config: Config = {
         description: {
           type: 'text',
           message: 'Package description',
-          initial: 'My awesome typescript library',
+          placeholder: 'My awesome typescript library',
         },
       },
 
@@ -50,7 +54,7 @@ const config: Config = {
             pascalCase: {
               type: 'text',
               message: 'Pascal case of project name',
-              initial: 'UnpluginStarter',
+              placeholder: 'UnpluginStarter',
               required: true,
             },
           },
@@ -126,6 +130,14 @@ const config: Config = {
           color: '#ffc131',
           url: 'sxzz/element-plus-tauri-starter',
         },
+      ],
+    },
+    {
+      name: 'Telegram Bot',
+      color: '#0088cc',
+      url: 'sxzz/telegram-bot-starter',
+      replaces: [
+        { from: 'telegram-bot-starter', to: (o) => o.project.folderName },
       ],
     },
   ],
