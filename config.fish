@@ -101,8 +101,6 @@ alias gop='git open'
 alias ghci='gh run list -L 1'
 alias fork="gh repo fork --default-branch-only --remote"
 
-alias hmm='gh copilot suggest'
-
 function ghdep --argument owner
     test -n "$owner"; or set owner sxzz
     gh search prs --owner $owner is:open author:app/renovate archived:false --json url --jq ".[].url" | gxargs -I URL bash -c 'echo "Approving & merging: URL" && gh pr review --approve URL && gh pr merge --squash --auto URL'
@@ -418,3 +416,8 @@ source ~/.orbstack/shell/init.fish 2>/dev/null || :
 
 # uv
 fish_add_path "$HOME/.local/bin"
+
+# Added by LM Studio CLI (lms)
+set -gx PATH $PATH /Users/kevin/.lmstudio/bin
+# End of LM Studio CLI section
+
