@@ -1,0 +1,17 @@
+[settings]
+idiomatic_version_file_enable_tools = ["pnpm", "yarn", "npm", "node"]
+minimum_release_age = "0"
+
+[tools]
+aube = "latest"
+java = "lts"
+node = "lts"
+"npm:@antfu/ni" = "latest"
+"npm:@sxzz/create" = "latest"
+"npm:actions-up" = "latest"
+"npm:npmx-connector" = "latest"
+"npm:publint" = "latest"
+"npm:sfw" = "latest"
+"npm:taze" = "latest"
+pnpm = "latest"
+yarn = "latest"

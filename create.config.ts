@@ -1,5 +1,4 @@
-import type { Config } from '/Users/kevin/Library/pnpm/global/5/node_modules/@sxzz/create'
-// import type { Config } from '/Users/kevin/Developer/open-source/create/src/types'
+import type { Config } from '/Users/kevin/.local/share/mise/installs/npm-sxzz-create/latest/node_modules/@sxzz/create/dist/index.mjs'
 
 const config: Config = {
   git: {

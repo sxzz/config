@@ -22,8 +22,11 @@ alias -s zip='unzip' >/dev/null
 alias -s bz2='tar -xjvf' >/dev/null
 alias -s jar='java -jar' >/dev/null
 
-alias os='cd ~/Developer/open-source'
 alias cppwd='pwd | tr -d \n | pbcopy'
+
+function i
+    builtin cd (zoxide query $HOME/Developer/open-source $argv)
+end
 
 # Git Aliases
 
@@ -154,7 +157,7 @@ alias nio="ni --prefer-offline"
 alias u="nup"
 alias ui="nup -i"
 alias uli="nup --latest -i"
-alias reni="rm -fr node_modules pnpm-lock.yaml yarn.lock && ni"
+alias reni="pnpm clean --lockfile && ni"
 alias nif="ni -f"
 alias ny="pnpm why --exclude-peers -r"
 
@@ -221,13 +224,6 @@ function get_upstream
     else
         console.red "No main or master branch found\n"
     end
-end
-
-# Switch node version (fnm)
-function sn
-    set versions (fnm ls | awk '{print $2}')
-    and set selected (fnm ls | awk '{print $2}' | tail -r | gum filter)
-    and fnm use $selected
 end
 
 # git new branch & git reset
@@ -379,23 +375,12 @@ fish_add_path $HOME/.composer/vendor/bin
 # Cargo, Rust
 fish_add_path $HOME/.cargo/bin
 
-# jenv
-set PATH $HOME/.jenv/bin $PATH
-status --is-interactive; and source (jenv init -|psub)
-
-# iTerm2
-source $HOME/.iterm2_shell_integration.fish
-
 set -a fish_user_paths ./node_modules/.bin
 
 # pnpm
 set -gx PNPM_HOME $HOME/Library/pnpm
-fish_add_path $PNPM_HOME
+fish_add_path $PNPM_HOME/bin
 # pnpm end
-
-# Corepack
-set -gx COREPACK_ENABLE_DOWNLOAD_PROMPT 0
-set -gx COREPACK_ENABLE_AUTO_PIN 0
 
 # Bun
 set -Ux BUN_INSTALL "$HOME/.bun"
@@ -421,3 +406,5 @@ fish_add_path "$HOME/.local/bin"
 set -gx PATH $PATH /Users/kevin/.lmstudio/bin
 # End of LM Studio CLI section
 
+# mise
+mise activate fish | source
